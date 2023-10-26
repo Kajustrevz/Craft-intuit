@@ -1,0 +1,29 @@
+version: '1'
+services:
+  comment-service-1:
+    image: comment-service-1:1.0
+    ports:
+      - "8081:8080"
+    depends_on:
+      - mysql-db
+  comment-service-2:
+    image: comment-service-1:1.0
+    ports:
+      - "8082:8080"
+    depends_on:
+      - mysql-db
+  mysql-db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234qwer
+    ports:
+      - "3306:3306"
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf # Mount a custom Nginx configuration file
+    depends_on:
+        - comment-service-1
+        - comment-service-2
