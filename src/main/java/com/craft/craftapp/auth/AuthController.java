@@ -5,11 +5,14 @@ import com.craft.craftapp.common.dto.ApiStatus;
 import com.craft.craftapp.auth.dto.UserRequest;
 import com.craft.craftapp.auth.dto.TokenDetails;
 import com.craft.craftapp.exception.UserAlreadyExistsException;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,8 +25,12 @@ public class AuthController {
 
     @GetMapping("/hello")
     public String hello(Authentication auth) {
-        User user = (User) auth.getPrincipal();
-        return "Hello " + user.getUsername() + "!";
+        if (auth != null && auth.isAuthenticated() && auth.getPrincipal() instanceof User) {
+            User user = (User) auth.getPrincipal();
+            return "Hello " + user.getUsername() + "!";
+        }else{
+            throw new AuthenticationServiceException("authentication failed");
+        }
     }
 
     @PostMapping("signup")

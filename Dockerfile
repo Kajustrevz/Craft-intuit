@@ -1,24 +1,16 @@
-# Use a base image with Java 11 and a lightweight Linux distribution
-FROM maven:3.8.1-openjdk-11
+FROM openjdk:11-jre-slim
+
+# Install the `procps` package, which includes the `ps` command
+RUN apt-get update && apt-get install -y procps
 
 # Set the working directory within the container
 WORKDIR /app
 
-# Copy the pom.xml file to the container
-COPY pom.xml .
-
-# Copy the src directory to the container
-COPY . .
-
-# Build the application with Maven
-RUN mvn clean install -DskipTests
+COPY target/craft-app-0.0.1-SNAPSHOT.jar /app/app.jar
 
 # Expose port 8080 for the application
 EXPOSE 8080
 
-RUN pwd
+ENV ENVIRONMENT=prod
 
-RUN ls
-
-# Run the application when the container starts
-CMD ["java", "-jar", "/app/target/craft-app-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "app.jar"]
